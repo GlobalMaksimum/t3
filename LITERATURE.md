@@ -1,5 +1,12 @@
 # Literature Review
 
+
+## State-of-the-Art Leaderboard for COCO
+
+[Click here](https://paperswithcode.com/sota/object-detection-coco)
+
+
+
 ## Papers
 ### AdaScale: Towards Real-time Video Object Detection Using Adaptive Scaling 
 [click here](https://arxiv.org/abs/1902.02910)
