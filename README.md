@@ -1,5 +1,11 @@
 # t3
 
+### ! Since this project contains submodule make sure you clone the project with !
+
+```
+git clone --recursive https://github.com/GlobalMaksimum/t3
+```
+
 ## Project Structure
 
 ```
