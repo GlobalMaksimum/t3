@@ -2,6 +2,7 @@
 
 ## Project Structure
 
+```
 .
 ├── data
 │   ├── external
@@ -17,7 +18,7 @@
 ├── src
     ├── dataloaders
     └── utils
-
+```
 
 ## References
 
