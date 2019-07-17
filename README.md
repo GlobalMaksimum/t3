@@ -1,5 +1,31 @@
 # t3
 
+### ! Since this project contains submodule make sure you clone the project with !
+
+```
+git clone --recursive https://github.com/GlobalMaksimum/t3
+```
+
+## Project Structure
+
+```
+.
+├── data
+│   ├── external
+│   └── t3-data
+│       └── gonderilecek_veriler
+│           ├── B160519_V1_K1
+│           ├── T190619_V1_K1
+│           ├── T190619_V2_K1
+│           └── T190619_V3_K1
+├── models
+├── notebooks
+├── reports
+├── src
+    ├── dataloaders
+    └── utils
+```
+
 ## References
 
 ### Specification
