@@ -39,3 +39,13 @@ git clone --recursive https://github.com/GlobalMaksimum/t3
 
 ### Initial Report Template
 [Click for document](https://www.teknofestistanbul.org/Content/files/2019_satnameler/yapay_zeka_otr_sablon_14.docx)
+
+## Evaluation
+*_txt file format:_* 
+
+```
+image_name,x1,y1,x2,y2,class_id,...
+...
+```
+
+`python evaluate.py gt.txt preds.txt --threshold 0.6`
