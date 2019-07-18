@@ -21,7 +21,10 @@ def get_score(y_class, y_pred, pred_ind, IoU_scores, threshold):
     scores = []
     temp = []
     
-    for i, j in enumerate(pred_ind):
+    inds = np.argsort(-IoU_scores)
+    print(inds, IoU_scores)
+    
+    for i, j in zip(inds, pred_ind[inds]):
         y_c = y_class[j]
         y_p = y_pred[i]
         if y_c != y_p:
