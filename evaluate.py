@@ -22,7 +22,6 @@ def get_score(y_class, y_pred, pred_ind, IoU_scores, threshold):
     temp = []
     
     inds = np.argsort(-IoU_scores)
-    print(inds, IoU_scores)
     
     for i, j in zip(inds, pred_ind[inds]):
         y_c = y_class[j]
@@ -38,6 +37,9 @@ def get_score(y_class, y_pred, pred_ind, IoU_scores, threshold):
             scores.append(-1 * (1 - IoU_score))
             
         temp.append(pred_ind[i])
+    
+    # Add not found GT boxes
+    scores += [-1.0] * (len(y_class) - len(np.unique(pred_ind)))
         
     return scores
 
