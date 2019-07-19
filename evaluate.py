@@ -1,6 +1,5 @@
 import os
 import click
-from tabulate import tabulate
 import numpy as np
 
 def compute_IoU(boxA, boxB):
@@ -17,7 +16,12 @@ def compute_IoU(boxA, boxB):
     
     return iou
 
+n_TP = 0
+n_FP = 0
+n_FN = 0
+
 def get_score(y_class, y_pred, pred_ind, IoU_scores, threshold):
+    global n_TP, n_FP, n_FN;
     scores = []
     temp = []
     
@@ -27,23 +31,27 @@ def get_score(y_class, y_pred, pred_ind, IoU_scores, threshold):
         y_c = y_class[j]
         y_p = y_pred[i]
         if y_c != y_p:
+            n_FP += 1
             scores.append(-1.0)
             continue
         IoU_score = IoU_scores[i]
         if IoU_score >= threshold:
             if pred_ind[i] not in temp:
+                n_TP += 1
                 scores.append(3 * IoU_score)
         else:
+            n_FP += 1
             scores.append(-1 * (1 - IoU_score))
             
         temp.append(pred_ind[i])
     
     # Add not found GT boxes
     scores += [-1.0] * (len(y_class) - len(np.unique(pred_ind)))
+    n_FN += (len(y_class) - len(np.unique(pred_ind)))
         
-    return scores
+    return np.sum(scores)
 
-fn = lambda x: int(x.strip())
+fn = lambda x: float(x.strip())
 
 @click.command()
 @click.argument('y_true', type=click.File('r'))
@@ -52,22 +60,30 @@ fn = lambda x: int(x.strip())
 def main(y_true, y_scores, threshold):
     gt_values = {}
     for i in y_true:
-        key = i.split(',')[0]
+        key = i.split(',')[0].strip()
         values = list(map(fn, i.split(',')[1:]))
         gt_values[key] = np.array([[(values[j], values[j+1], values[j+2], values[j+3]), values[j+4]] for j in range(0, len(values), 5)])
 
     pred_values = {}
     for i in y_scores:
-        key = i.split(',')[0]
+        key = i.split(',')[0].strip()
         values = list(map(fn, i.split(',')[1:]))
         pred_values[key] = np.array([[(values[j], values[j+1], values[j+2], values[j+3]), values[j+4]] for j in range(0, len(values), 5)])
         
     assert pred_values.keys() == gt_values.keys(), 'predicted image set and gt image set is not equal'
         
     all_scores = []
+    n_gt = 0
     for key in pred_values.keys():
         pred_val, gt_val = pred_values[key], gt_values[key]
         len_pred, len_gt= len(pred_val), len(gt_val)
+        
+        n_gt += len_gt
+        
+        if not len(gt_val):
+            all_scores.append(-1 * len_pred)
+            continue
+        
         score_arr = np.zeros((len_pred, len_gt))
         for i in range(len_pred):
             for j in range(len_gt):
@@ -80,7 +96,9 @@ def main(y_true, y_scores, threshold):
         IoU_score = get_score(y_class, y_pred, score_arr.argmax(axis=1), scores, threshold)
         all_scores.append(IoU_score)
                 
-    click.echo(all_scores)
+    click.echo(np.sum(all_scores))
+    click.echo(f'n_gt: {n_gt}')
+    click.echo(f'n_TP: {n_TP}, n_FP: {n_FP}, n_FN: {n_FN}')
 
 if __name__ == "__main__":
     main()
