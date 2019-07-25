@@ -1,10 +1,44 @@
 # t3
 
+## Installation
+
 ### ! Since this project contains submodule make sure you clone the project with !
 
 ```
 git clone --recursive https://github.com/GlobalMaksimum/t3
 ```
+
+#### Requirements (Docker version will be released)
+
+Linux
+Python 3.5+
+PyTorch 1.0+ or PyTorch-nightly
+GCC 4.9+
+mmcv
+
+- Install Cython if not already exists.
+
+```
+conda install cython
+```
+
+- Install PyTorch stable or nightly and torchvision following the official instructions.
+
+```
+cd mmdetection
+```
+- Compile cuda extensions.
+
+```
+./compile.sh
+```
+
+- Install mmdetection (other dependencies will be installed automatically).
+
+```
+python setup.py develop
+```
+
 
 ## Project Structure
 
