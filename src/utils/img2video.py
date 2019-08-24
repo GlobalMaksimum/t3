@@ -3,11 +3,12 @@ import os
 from tqdm import tqdm
 
 # Folder names that contains scenes
-scene_names = ['T190619_V1_K1', 'T190619_V2_K1', 'T190619_V3_K1', 'B160519_V1_K1']
+# scene_names = ['T190619_V1_K1', 'T190619_V2_K1', 'T190619_V3_K1', 'B160519_V1_K1']
+scene_names = ['B23072019_V1_K1', 'T190619_V4_K1']
 # Input image base folder 
-image_folder_base = '../../data/t3-data/gonderilecek_veriler/'
+image_folder_base = '/home/deep/t3/data/ktr-test/test/'
 # Output video base folder
-video_output_base = '../../data/t3-data/gonderilecek_veriler/'
+video_output_base = '/home/deep/t3/data/ktr-test/test/'
 
 
 for scene_name in scene_names:

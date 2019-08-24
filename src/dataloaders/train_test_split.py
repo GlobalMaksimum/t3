@@ -25,12 +25,15 @@ import pickle
 
 # CONSTANTS
 SCENE_NAMES = ['T190619_V1_K1', 'T190619_V2_K1', 'T190619_V3_K1', 'B160519_V1_K1']
-NUM_THROW_AWAY = 30 # how many frames will be removed between each split
-TEST_SIZE, VAL_SIZE, TRAIN_SIZE = 0.2, 0.2, 0.6 # manually adjusted sample sizes: (train:2849, val:453, test:726)
-FRAME_FILE_PATH = '../../data/t3-data/gonderilecek_veriler/veriler.json'
-TRAINING_ANNOT_PATH = '../../data/t3-data/gonderilecek_veriler/training.pkl'
-VAL_ANNOT_PATH = '../../data/t3-data/gonderilecek_veriler/validation.pkl'
-TEST_ANNOT_PATH = '../../data/t3-data/gonderilecek_veriler/test.pkl'
+SCENE_NAMES += ['T190619_V5_K1', 'B270619_V1_K1']
+NUM_THROW_AWAY = 90 # how many frames will be removed between each split
+TEST_SIZE, VAL_SIZE, TRAIN_SIZE = 0.4, 0.2, 0.4 # manually adjusted sample sizes
+
+DATA_PATH = '../../data/t3-data/merged_veriler/'
+FRAME_FILE_PATH = DATA_PATH + 'veriler.json'
+TRAINING_ANNOT_PATH = DATA_PATH + 'training.pkl'
+VAL_ANNOT_PATH = DATA_PATH + 'validation.pkl'
+TEST_ANNOT_PATH = DATA_PATH + 'test.pkl'
 
 
 # annotation files to be filled in
@@ -85,10 +88,10 @@ def t3_to_mmdetection_annotation(frame_annot):
     
     for obj in frame_annot['objeler']:
         bbox = [obj['x0'], obj['y0'], obj['x1'], obj['y1']]
-        # 0 if class is yaya, 1 if arac
+        # 1 if class is yaya, 2 if arac
         if 'tur' in obj: # some objects' class are not labeled, we skip them
             mmdetection_annot['ann']['bboxes'].append(bbox)
-            mmdetection_annot['ann']['labels'].append(0 if obj['tur'] != 'arac' else 1)
+            mmdetection_annot['ann']['labels'].append(1 if obj['tur'] != 'arac' else 2)
             
     # Type checks
     mmdetection_annot['ann']['bboxes'] = np.array(mmdetection_annot['ann']['bboxes']).astype('float32')
@@ -99,7 +102,7 @@ def t3_to_mmdetection_annotation(frame_annot):
 
 def main():
     for scene_name in SCENE_NAMES:
-        image_folder = '../../data/t3-data/gonderilecek_veriler/{}/'.format(scene_name)
+        image_folder = DATA_PATH + '{}/'.format(scene_name)
 
         # get names 
         images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
@@ -110,7 +113,7 @@ def main():
         ### IDEA OF SPLITTING  ###
         # Split frames as:
         #
-        # Validation(0.15 * len) - Throw away(30 frame)- Train(0.7 * len) - Throw away(30 frame) - Test(0.15 * len)
+        # Validation(val_ratio * len) - Throw away-Train(train_ratio * len) - Throw away - Test(test_ratio * len)
         # 
         # Why throw away?: If we have n'th frame in validation and (n+1)'th frame in training this may cause overfitting.
         ##########################
