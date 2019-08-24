@@ -22,9 +22,9 @@ from mmdetection.mmdet.apis import init_detector, inference_detector, show_resul
 # CONSTANTS
 config_file = '../mmdetection/configs/faster_rcnn_r50_fpn_1x.py'
 checkpoint_file = '../mmdetection/work_dirs/faster_rcnn_r50_fpn_1x/epoch_12.pth'
-img = '../p.jpg'  # or img = mmcv.imread(img), which will only load it once
-out_file_name = 'result_test.png'
-class_names = ['person', 'vehicle'] 
+img = '/home/deep/python_projects/visdrone/VisDrone2019-VID-val/sequences/uav0000305_00000_v/0000048.jpg'  # or img = mmcv.imread(img), which will only load it once
+out_file_name = 'result.png'
+class_names = ['arac', 'insan'] 
 auto_class = False # turn this on if you want to get class names directly from model and config
 
 
@@ -39,7 +39,6 @@ result = inference_detector(model, img)
 
 # remove `out_file` if you want it to show images on local
 # show_result(img, result, model.CLASSES, score_thr=0.3, out_file=out_file_name)
-show_result(img, result, model.CLASSES, score_thr=0.3, out_file=out_file_name)
+show_result(img, result, class_names, score_thr=0.3, out_file=out_file_name)
 # -
-
 
