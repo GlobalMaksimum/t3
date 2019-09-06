@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.7
+#       jupytext_version: 1.2.1
 #   kernelspec:
 #     display_name: Python 3.6 (TensorFlow GPU)
 #     language: python
