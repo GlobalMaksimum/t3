@@ -1,0 +1,75 @@
+# Copyright 2016 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+# Put all your resources under `resources:`. For each resource, you need:
+# - The type of resource. In this example, the type is a Compute VM instance.
+# - An internal name for the resource.
+# - The properties for the resource. In this example, for VM instances, you add
+#   the machine type, a boot disk, network information, and so on.
+#
+# For a list of supported resources,
+# see https://cloud.google.com/deployment-manager/docs/configuration/supported-resource-types.
+resources:
+- type: compute.v1.instance
+  name: quickstart-deployment-vm
+  properties:
+    # The properties of the resource depend on the type of resource. For a list
+    # of properties, see the API reference for the resource.
+    zone: europe-west4-b
+    # Your VM should be one of
+    # n1-standard-4
+    # n1-standard-8
+    # Full list can be found in https://cloud.google.com/compute/docs/machine-types#n1_machine_types
+    machineType: https://www.googleapis.com/compute/v1/projects/t3-project/zones/europe-west4-b/machineTypes/n1-standard-8
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        # Ensure that you are using one of the Google tested images (if you do not need something very special)
+        #   Full list of images are available in https://cloud.google.com/deep-learning-vm/docs/images
+        #
+        sourceImage: https://www.googleapis.com/compute/v1/projects/deeplearning-platform-release/global/images/pytorch-latest-gpu-20190820
+    scheduling:
+      preemptible: true
+    # Use following strings for GPU you need
+    # 
+    # NVIDIA® Tesla® T4: nvidia-tesla-t4: Generally Available
+    # NVIDIA® Tesla® V100: nvidia-tesla-v100: Generally Available
+    # NVIDIA® Tesla® P100: nvidia-tesla-p100: Generally Available
+    # NVIDIA® Tesla® P4: nvidia-tesla-p4: Generally Available
+    # NVIDIA® Tesla® K80: nvidia-tesla-k80: Generally Available
+    #
+    # Ensure that you chek `GPU comparison chart`  in https://cloud.google.com/compute/docs/gpus/
+    # Also ensure that accelerator is available for your zone
+    # gcloud compute accelerator-types list --filter="zone:( europe-west4-b )"
+    guestAccelerators:
+      - acceleratorType: projects/t3-project/zones/europe-west4-b/acceleratorTypes/nvidia-tesla-p4
+        acceleratorCount: 1
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          cd /tmp && git clone https://github.com/open-mmlab/mmdetection && cd mmdetection && sudo /opt/anaconda3/bin/python setup.py install
+      - key: install-nvidia-driver
+        value: "True"
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/t3-project/global/networks/default
+      # Access Config required to give the instance a public IP address
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
