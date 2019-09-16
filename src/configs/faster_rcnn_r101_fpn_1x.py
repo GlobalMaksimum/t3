@@ -1,7 +1,7 @@
 # model settings
 model = dict(
     type='FasterRCNN',
-    pretrained='modelzoo://resnet101',
+    pretrained=None,#'modelzoo://resnet101',
     backbone=dict(
         type='ResNet',
         depth=101,
@@ -37,7 +37,7 @@ model = dict(
         in_channels=256,
         fc_out_channels=1024,
         roi_feat_size=7,
-        num_classes=3,
+        num_classes=4,
         target_means=[0., 0., 0., 0.],
         target_stds=[0.1, 0.1, 0.2, 0.2],
         reg_class_agnostic=False,
@@ -99,7 +99,7 @@ test_cfg = dict(
 )
 # dataset settings
 dataset_type = 'CustomDataset'
-data_root = '../../data/'
+data_root = '../../data/t3-data/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 data = dict(
@@ -107,7 +107,7 @@ data = dict(
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'training.pkl',
+        ann_file=data_root + 'splits/all/training.pkl',
         img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
@@ -118,7 +118,7 @@ data = dict(
         with_label=True),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'validation.pkl',
+        ann_file=data_root + 'splits/all/validation.pkl',
         img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
@@ -129,7 +129,7 @@ data = dict(
         with_label=True),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'test.pkl',
+        ann_file=data_root + 'splits/all/test.pkl',
         img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
@@ -161,7 +161,7 @@ log_config = dict(
 total_epochs = 2
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/faster_rcnn_r101_fpn_1x'
-load_from = None
+work_dir = '../../models/work_dirs/faster_rcnn_r101_fpn_1x'
+load_from = '../../models/pretrained/faster_rcnn_r101_fpn_1x_20181129-d1468807.pth'
 resume_from = None #'./pretrained/faster_rcnn_r101_fpn_1x_20181129-d1468807.pth'
 workflow = [('train', 1)]

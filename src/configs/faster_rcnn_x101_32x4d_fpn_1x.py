@@ -1,7 +1,7 @@
 # model settings
 model = dict(
     type='FasterRCNN',
-    pretrained='open-mmlab://resnext101_32x4d',
+    pretrained=None, #'open-mmlab://resnext101_32x4d',
     backbone=dict(
         type='ResNeXt',
         depth=101,
@@ -39,7 +39,7 @@ model = dict(
         in_channels=256,
         fc_out_channels=1024,
         roi_feat_size=7,
-        num_classes=81,
+        num_classes=4,
         target_means=[0., 0., 0., 0.],
         target_stds=[0.1, 0.1, 0.2, 0.2],
         reg_class_agnostic=False,
@@ -100,39 +100,39 @@ test_cfg = dict(
     # e.g., nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.05)
 )
 # dataset settings
-dataset_type = 'CocoDataset'
-data_root = 'data/coco/'
+dataset_type = 'CustomDataset'
+data_root = '../../data/t3-data/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 data = dict(
-    imgs_per_gpu=2,
+    imgs_per_gpu=1,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train2017.json',
-        img_prefix=data_root + 'train2017/',
+        ann_file=data_root + 'splits/all/training.pkl',
+        img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0.5,
         with_mask=False,
-        with_crowd=True,
+        with_crowd=False,
         with_label=True),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
+        ann_file=data_root + 'splits/all/validation.pkl',
+        img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0,
         with_mask=False,
-        with_crowd=True,
+        with_crowd=False,
         with_label=True),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
+        ann_file=data_root + 'splits/all/test.pkl',
+        img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
@@ -156,14 +156,14 @@ log_config = dict(
     interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
-        # dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook')
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 12
+total_epochs = 5
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/faster_rcnn_x101_32x4d_fpn_1x'
-load_from = None
+work_dir = '../../models/work_dirs/faster_rcnn_x101_32x4d_fpn_1x'
+load_from = '../../models/pretrained/faster_rcnn_x101_32x4d_fpn_1x_20181218-ad81c133.pth'
 resume_from = None
 workflow = [('train', 1)]

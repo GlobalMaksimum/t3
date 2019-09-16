@@ -44,15 +44,15 @@ anns = pickle.load(open('../../data/t3-data/only_yaya_test_frames.pkl', 'rb'))
 # config_file = '../../src/configs/libra_rcnn/libra_retinanet_r50_fpn_1x.py'
 # checkpoint_file = '../mmdetection/work_dirs/libra_retinanet_r50_fpn_1x/epoch_2.pth'
 
-config_file = '../configs/guided_anchoring/ga_retinanet_x101_32x4d_fpn_1x.py'
-checkpoint_file = '../../models/work_dirs/ga_retinanet_x101_32x4d_fpn_1x/latest.pth'
+# config_file = '../configs/guided_anchoring/ga_retinanet_x101_32x4d_fpn_1x.py'
+# checkpoint_file = '../../models/work_dirs/ga_retinanet_x101_32x4d_fpn_1x/latest.pth'
 
 
 # config_file = '../mmdetection/configs/retinanet_r50_fpn_1x.py'
 # checkpoint_file = '../mmdetection/work_dirs/retinanet_r50_fpn_1x_visdrone/epoch_2.pth'
 
-# config_file = '../../src/configs/cascade_rcnn_r50_fpn_1x.py'
-# checkpoint_file = '../../models/work_dirs/cascade_rcnn_r50_fpn_1x-all/latest.pth'
+config_file = '../../src/configs/cascade_rcnn_r50_fpn_1x.py'
+checkpoint_file = '../../models/work_dirs/cascade_rcnn_r50_fpn_1x-arac/latest.pth'
 
 # config_file = '../mmdetection/configs/faster_rcnn_r101_fpn_1x.py'
 # checkpoint_file = '../mmdetection/work_dirs/old_workdir/faster_rcnn_r101_fpn_1x/epoch_15.pth'

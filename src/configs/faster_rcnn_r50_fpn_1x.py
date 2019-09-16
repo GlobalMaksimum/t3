@@ -1,7 +1,7 @@
 # model settings
 model = dict(
     type='FasterRCNN',
-    pretrained='torchvision://resnet50',
+    pretrained=None,#'torchvision://resnet50',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -37,7 +37,7 @@ model = dict(
         in_channels=256,
         fc_out_channels=1024,
         roi_feat_size=7,
-        num_classes=3,
+        num_classes=2,
         target_means=[0., 0., 0., 0.],
         target_stds=[0.1, 0.1, 0.2, 0.2],
         reg_class_agnostic=False,
@@ -93,24 +93,24 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100)
+        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100),
     # soft-nms is also supported for rcnn testing
-    # e.g., nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.05)
+    nms=dict(type='soft_nms', iou_thr=0.4, min_score=0.05)
 )
 # dataset settings
 dataset_type = 'CustomDataset'
-data_root = '../../data/external/visdrone/'
-test_data_root = '../../data/t3-data/gonderilecek_veriler/'
+data_root = '../../data/t3-data-grid/'
+test_data_root = '../../data/t3-data-grid/'
 data_root = test_data_root
 # data_root = test_data_root
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 data = dict(
-    imgs_per_gpu=4,
-    workers_per_gpu=8,
+    imgs_per_gpu=2,
+    workers_per_gpu=4,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'training.pkl',
+        ann_file=data_root + 'grid-yaya-t3-subset-visdrone.pkl',
         img_prefix=data_root + '',
         img_scale=(1333, 800),
         img_norm_cfg=img_norm_cfg,
@@ -120,18 +120,7 @@ data = dict(
         with_crowd=False,
         with_label=True
     ),
-    val=dict(
-        type=dataset_type,
-        ann_file=data_root + 'validation.pkl',
-        img_prefix=data_root + '',
-        img_scale=(1333, 800),
-        img_norm_cfg=img_norm_cfg,
-        size_divisor=32,
-        flip_ratio=0,
-        with_mask=False,
-        with_crowd=False,
-        with_label=True
-    ),
+    val=None,
     test=dict(
         type=dataset_type,
         ann_file=test_data_root + 'test.pkl',
@@ -161,14 +150,14 @@ log_config = dict(
     interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
-        # dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook')
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 8
+total_epochs = 30
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/faster_rcnn_r50_fpn_1x_mix'
-load_from = None
-resume_from = './work_dirs/faster_rcnn_r50_fpn_1x_visdrone/epoch_3.pth'
+work_dir = '../../models/work_dirs/faster_rcnn_r50_fpn_grid-yaya-t3-subset-visdrone'
+load_from = '../../models/pretrained/faster_rcnn_r50_fpn_1x_20181010-3d1b3351.pth'
+resume_from = None
 workflow = [('train', 1)]
