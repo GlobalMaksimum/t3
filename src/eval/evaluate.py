@@ -65,6 +65,41 @@ def get_score(y_class, y_pred, pred_ind, IoU_scores, threshold):
         
     return np.sum(scores)
 
+def get_metric_IoU(y_true, y_pred, threshold=0.6):
+    all_scores = []
+    for y_t, y_p in zip(y_true, y_pred):
+        y_t_bboxes = y_t[0]
+        y_p_bboxes = y_p[0]
+
+        y_t_labels = y_t[1]
+        y_p_labels = y_p[1]
+
+        len_pred, len_gt = len(y_p_bboxes), len(y_t_bboxes)
+                
+        if not len(y_t_bboxes):
+            all_scores.append(-1 * len_pred)
+            continue
+        
+        u_c, cnt = np.unique(y_t_labels, return_counts=True)
+        for cl, ct in zip(u_c, cnt):
+            stats[cl]['total'] += ct
+        
+        score_arr = np.zeros((len_pred, len_gt))
+        for i in range(len_pred):
+            for j in range(len_gt):
+                score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])
+                
+        
+        if len_pred:
+            scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
+
+            IoU_score = get_score(y_t_labels, y_p_labels, score_arr.argmax(axis=1), scores, threshold)
+        else:
+            IoU_score = -1 * (len_gt - len_pred)
+        all_scores.append(IoU_score)
+
+    return np.sum(all_scores)
+
 fn = lambda x: float(x.strip())
 
 @click.command()
@@ -86,42 +121,26 @@ def main(y_true, y_scores, threshold):
         
     assert pred_values.keys() == gt_values.keys(), 'predicted image set and gt image set is not equal'
         
-    all_scores = []
-    n_gt = 0
+    y_true = []
+    y_pred = []
     for key in pred_values.keys():
         pred_val, gt_val = pred_values[key], gt_values[key]
-        len_pred, len_gt= len(pred_val), len(gt_val)
-        
-        n_gt += len_gt
-            
-        if not len(gt_val):
-            all_scores.append(-1 * len_pred)
-            continue
-        
-        u_c, cnt = np.unique(gt_val[:, 1], return_counts=True)
-        for cl, ct in zip(u_c, cnt):
-            stats[cl]['total'] += ct
-        
-        score_arr = np.zeros((len_pred, len_gt))
-        for i in range(len_pred):
-            for j in range(len_gt):
-                score_arr[i, j] = compute_IoU(pred_val[i][0], gt_val[j][0])
-                
-        
-        if len(pred_val):
-            y_class = gt_val[:, 1]
-            y_pred = pred_val[:, 1]
-            scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
 
-            IoU_score = get_score(y_class, y_pred, score_arr.argmax(axis=1), scores, threshold)
-        else:
-            IoU_score = -1 * (len(gt_val) - len(pred_val))
-        all_scores.append(IoU_score)
+        gt_bboxes = gt_val[:, 0]
+        pred_bboxes = pred_val[:, 0]
+
+        gt_labels = gt_val[:, 1]
+        pred_labels = pred_val[:, 1]
+        
+        y_true.append((gt_bboxes, gt_labels))
+        y_pred.append((pred_bboxes, pred_labels))
+
+    all_score = get_metric_IoU(y_true, y_pred, threshold)
     
     print(stats)
     click.echo(f'Total Box: {stats[0]["total"] + stats[1]["total"]}')
     click.echo('\n================ T3 METRIC ================')
-    click.echo(f'{np.sum(all_scores):.3f} over {3 * (stats[0]["total"] + stats[1]["total"])}')
+    click.echo(f'{all_score:.3f} over {3 * (stats[0]["total"] + stats[1]["total"])}')
     click.echo('\n=========== PRECISION & RECALL ============')
     for k, v in stats.items():
         cl = 'yaya' if k == 0 else 'arac'
