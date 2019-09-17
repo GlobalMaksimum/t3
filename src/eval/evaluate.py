@@ -128,8 +128,8 @@ def main(y_true, y_scores, threshold):
         if stats[k]['total'] == 0:
             continue
             
-        pre = precision(stats[k]['n_TP'], stats[k]['n_FN'])
-        rec = recall(stats[k]['n_TP'], stats[k]['n_FP'])
+        pre = precision(stats[k]['n_TP'], stats[k]['n_FP'])
+        rec = recall(stats[k]['n_TP'], stats[k]['n_FN'])
         click.echo(f"{cl}: \n\tprecision: {pre:.3f} \n\trecall: {rec:.3f}\n\tavg: {(pre + rec) / 2:.3f}")
         
 #     click.echo(f'n_gt: {n_gt}')
