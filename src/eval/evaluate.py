@@ -78,6 +78,8 @@ def get_metric_IoU(y_true, y_pred, threshold=0.6):
                 
         if not len(y_t_bboxes):
             all_scores.append(-1 * len_pred)
+            for l in y_p_labels:
+               stats[l]['n_FP'] += 1 
             continue
         
         u_c, cnt = np.unique(y_t_labels, return_counts=True)
@@ -99,6 +101,162 @@ def get_metric_IoU(y_true, y_pred, threshold=0.6):
         all_scores.append(IoU_score)
 
     return np.sum(all_scores)
+
+def get_metric_precision(y_true, y_pred, threshold=0.6):
+    all_scores = []
+    for y_t, y_p in zip(y_true, y_pred):
+        y_t_bboxes = y_t[0]
+        y_p_bboxes = y_p[0]
+
+        y_t_labels = y_t[1]
+        y_p_labels = y_p[1]
+
+        len_pred, len_gt = len(y_p_bboxes), len(y_t_bboxes)
+                
+        if not len(y_t_bboxes):
+            all_scores.append(-1 * len_pred)
+            for l in y_p_labels:
+                stats[l]['n_FP'] += 1 
+            continue
+        
+        u_c, cnt = np.unique(y_t_labels, return_counts=True)
+        for cl, ct in zip(u_c, cnt):
+            stats[cl]['total'] += ct
+        
+        score_arr = np.zeros((len_pred, len_gt))
+        for i in range(len_pred):
+            for j in range(len_gt):
+                score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])
+                
+        
+        if len_pred:
+            scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
+
+            IoU_score = get_score(y_t_labels, y_p_labels, score_arr.argmax(axis=1), scores, threshold)
+        else:
+            IoU_score = -1 * (len_gt - len_pred)
+        all_scores.append(IoU_score)
+
+    precision_values = []
+
+    for k, _ in stats.items():
+        cl = 'yaya' if k == 0 else 'arac'
+        if stats[k]['total'] == 0:
+            continue
+        pre = precision(stats[k]['n_TP'], stats[k]['n_FP'])
+
+        precision_values.append(pre)
+
+    return precision_values
+
+
+def get_metric_recall(y_true, y_pred, threshold=0.6):
+    all_scores = []
+    for y_t, y_p in zip(y_true, y_pred):
+        y_t_bboxes = y_t[0]
+        y_p_bboxes = y_p[0]
+
+        y_t_labels = y_t[1]
+        y_p_labels = y_p[1]
+
+        len_pred, len_gt = len(y_p_bboxes), len(y_t_bboxes)
+                
+        if not len(y_t_bboxes):
+            all_scores.append(-1 * len_pred)
+            for l in y_p_labels:
+                stats[l]['n_FP'] += 1 
+            continue
+        
+        u_c, cnt = np.unique(y_t_labels, return_counts=True)
+        for cl, ct in zip(u_c, cnt):
+            stats[cl]['total'] += ct
+        
+        score_arr = np.zeros((len_pred, len_gt))
+        for i in range(len_pred):
+            for j in range(len_gt):
+                score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])
+                
+        
+        if len_pred:
+            scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
+
+            IoU_score = get_score(y_t_labels, y_p_labels, score_arr.argmax(axis=1), scores, threshold)
+        else:
+            IoU_score = -1 * (len_gt - len_pred)
+        all_scores.append(IoU_score)
+
+    recall_values = []
+
+    for k, _ in stats.items():
+        cl = 'yaya' if k == 0 else 'arac'
+        if stats[k]['total'] == 0:
+            continue
+        rec = recall(stats[k]['n_TP'], stats[k]['n_FN'])
+
+        recall_values.append(rec)
+
+    return recall_values
+
+def get_metric_f1(y_true, y_pred, threshold=0.6):
+    all_scores = []
+    for y_t, y_p in zip(y_true, y_pred):
+        y_t_bboxes = y_t[0]
+        y_p_bboxes = y_p[0]
+
+        y_t_labels = y_t[1]
+        y_p_labels = y_p[1]
+
+        len_pred, len_gt = len(y_p_bboxes), len(y_t_bboxes)
+                
+        if not len(y_t_bboxes):
+            all_scores.append(-1 * len_pred)
+            for l in y_p_labels:
+                stats[l]['n_FP'] += 1 
+            continue
+        
+        u_c, cnt = np.unique(y_t_labels, return_counts=True)
+        for cl, ct in zip(u_c, cnt):
+            stats[cl]['total'] += ct
+        
+        score_arr = np.zeros((len_pred, len_gt))
+        for i in range(len_pred):
+            for j in range(len_gt):
+                score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])
+                
+        
+        if len_pred:
+            scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
+
+            IoU_score = get_score(y_t_labels, y_p_labels, score_arr.argmax(axis=1), scores, threshold)
+        else:
+            IoU_score = -1 * (len_gt - len_pred)
+        all_scores.append(IoU_score)
+
+    precision_values = []
+
+    for k, _ in stats.items():
+        cl = 'yaya' if k == 0 else 'arac'
+        if stats[k]['total'] == 0:
+            continue
+        pre = precision(stats[k]['n_TP'], stats[k]['n_FP'])
+
+        precision_values.append(pre)
+
+    recall_values = []
+
+    for k, _ in stats.items():
+        cl = 'yaya' if k == 0 else 'arac'
+        if stats[k]['total'] == 0:
+            continue
+        rec = recall(stats[k]['n_TP'], stats[k]['n_FN'])
+
+        recall_values.append(rec)
+
+    precision_values = np.array(precision_values)
+    recall_values = np.array(recall_values)
+
+    return list(2 * (precision_values * recall_values) / (precision_values + recall_values))
+
 
 fn = lambda x: float(x.strip())
 
