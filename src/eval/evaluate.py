@@ -90,8 +90,7 @@ def get_metric_IoU(y_true, y_pred, threshold=0.6):
         for i in range(len_pred):
             for j in range(len_gt):
                 score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])
-                
-        
+                    
         if len_pred:
             scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
 
@@ -126,8 +125,7 @@ def get_metric_precision(y_true, y_pred, threshold=0.6):
         score_arr = np.zeros((len_pred, len_gt))
         for i in range(len_pred):
             for j in range(len_gt):
-                score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])
-                
+                score_arr[i, j] = compute_IoU(y_p_bboxes[i], y_t_bboxes[j])                
         
         if len_pred:
             scores = score_arr[np.arange(len(score_arr)), score_arr.argmax(axis=1)]
@@ -283,12 +281,20 @@ def main(y_true, y_scores, threshold):
     y_pred = []
     for key in pred_values.keys():
         pred_val, gt_val = pred_values[key], gt_values[key]
-
-        gt_bboxes = gt_val[:, 0]
-        pred_bboxes = pred_val[:, 0]
-
-        gt_labels = gt_val[:, 1]
-        pred_labels = pred_val[:, 1]
+        
+        gt_bboxes = []
+        gt_labels = []
+        
+        if len(gt_val):
+            gt_bboxes = gt_val[:, 0]
+            gt_labels = gt_val[:, 1]
+            
+        pred_bboxes = []
+        pred_labels = []
+        
+        if len(pred_val):
+            pred_bboxes = pred_val[:, 0]
+            pred_labels = pred_val[:, 1]
         
         y_true.append((gt_bboxes, gt_labels))
         y_pred.append((pred_bboxes, pred_labels))
