@@ -62,6 +62,11 @@ python setup.py develop
 
 ## References
 
+### Model Training
+[MMDetection Documentation](https://mmdetection.readthedocs.io/en/latest/)
+
+For dataset preparation and model training refer to MMDetection Documentation. 
+
 ### Specification
 [Click for PDF](https://www.teknofestistanbul.org/Content/files/2019_satnameler/Yapay_Zeka_Yarismasi_Sartname_05.pdf)
 
